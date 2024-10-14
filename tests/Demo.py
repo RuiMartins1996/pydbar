@@ -24,7 +24,8 @@ Ref = read_data.read_data(parentFolderHomo, R, A, L)
 Kp = k_grid.k_grid(4, 6)
 
 # Creates the model which corresponds to the Dbar equation in the spectral parameter at each z of a z_grid.
-model = dBar.dBar("partial", Kp, Now, Ref, 1., 5)
+scatteringType = "partial"      
+model = dBar.dBar(scatteringType , Kp, Now, Ref, 1., 5)
 
 # Solves the problem for each z in the 2D plane, hence determining the conductivity at each z
 model.solve()
