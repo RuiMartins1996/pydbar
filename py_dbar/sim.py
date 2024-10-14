@@ -44,7 +44,7 @@ class sim:
         edgecolors='k', shading='flat', cmap="RdBu", alpha=0.5)
         fig.colorbar(tpc)
         
-
+        
 
         """ 1. FEM forward simulations """
         # setup EIT scan conditions

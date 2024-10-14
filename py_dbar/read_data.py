@@ -2,6 +2,10 @@ import numpy as np
 import math
 from numpy import linalg as LG
 
+#For error handling
+import os
+import sys
+
 
 pi = math.pi
 
@@ -12,11 +16,33 @@ pi = math.pi
 # L - Number of Electrodes
 class read_data:
 
-    # The Current and Voltage file should be in the format: L-1 lines with values for the L electrodes.
-    def __init__(self, Current, Voltage, r, AE, L):
+    def __init__(self, parentLocalFolder, r, AE, L):
         self.L = L
         self.r = r
         self.AE = AE
+
+        cwd = os.getcwd()
+
+        parentGlobalFolder = cwd+"/"+parentLocalFolder
+
+        try:
+            
+            if os.path.isdir(parentGlobalFolder):
+            
+                currentFile = parentGlobalFolder+"/Current.txt"
+                voltageFile = parentGlobalFolder+"/Voltage.txt"
+                if os.path.exists(currentFile) and os.path.exists(voltageFile):
+                    Current = np.loadtxt(currentFile) 
+                    Voltage = np.loadtxt(voltageFile)
+                else:
+                    raise FileNotFoundError(f"Either '{currentFile}' or '{voltageFile}' do not exist.")
+            else:
+                raise FileNotFoundError(f"Folder '{parentGlobalFolder}' is not a directory!")
+        except Exception as e:
+            print(f"Exception: {e}")
+            sys.exit(1)
+
+
         self.Current = Current.transpose() # Matrix L x L-1
         self.Voltage = Voltage.transpose() # Matrix L x L-1
         self.DNmap = np.zeros((L-1, L-1))

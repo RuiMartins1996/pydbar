@@ -10,14 +10,25 @@ import pyamg
 import matplotlib.pyplot as plt
 
 
+
+#rui
+from py_dbar import scattering
+
+
 pi = math.pi
 
 class dBar:
     
-    def __init__(self, R_z, m_z):
-        self.Z = np.zeros( (2**m_z, 2**m_z), dtype=complex)
-        self.load_mesh(1, m_z)
+    def __init__(self, scat_type, k_grid, Now, Ref,R_z,m_z):
         
+        self.Z = np.zeros( (2**m_z, 2**m_z), dtype=complex)
+        
+        self.load_mesh(R_z, m_z)
+        
+        self.k_grid = k_grid
+
+        self.S = scattering.scattering(scat_type, k_grid, Now, Ref)
+
         self.sigma = np.zeros((2**m_z, 2**m_z))
     
     def load_mesh(self, R, m):
@@ -38,7 +49,7 @@ class dBar:
         N = len(k_grid.pos_x)
 
         for l in range(N):
-                RHS[ k_grid.pos_x[l], k_grid.pos_y[l] ] = cmath.exp(-2j*( (k_grid.k[ k_grid.pos_x[l], k_grid.pos_y[l] ]*zz).real) )* tK.tK[k_grid.pos_x[l], k_grid.pos_y[l]]*complex(mu[l], -mu[l+N])
+                RHS[ k_grid.pos_x[l], k_grid.pos_y[l] ] = cmath.exp(-2j*( (k_grid.k[ k_grid.pos_x[l], k_grid.pos_y[l] ]*zz).real) )*tK[k_grid.pos_x[l], k_grid.pos_y[l]]*complex(mu[l], -mu[l+N])
 
 
         F_RHS = fft2(RHS)
@@ -57,8 +68,13 @@ class dBar:
         return mu
     
   
-    def solve(self, k_grid, tK):
+    def solve(self):
+
+        print("Solving model ...")
         
+        tK = self.S.tK
+        k_grid = self.k_grid
+
         N = len(k_grid.pos_x)
     
         # Define the b and initial solution as the vectors of 1+0.j
@@ -107,4 +123,5 @@ class dBar:
         sigma_x = np.ma.masked_where(sigma_x==0, sigma_x)
         plt.pcolormesh(X, Y, sigma_x, cmap='RdBu')
         plt.colorbar()   
+        plt.show()
     
